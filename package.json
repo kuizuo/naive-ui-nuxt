@@ -1,0 +1,64 @@
+{
+  "name": "naive-ui-nuxt",
+  "version": "1.0.0",
+  "description": "Naive UI module for Nuxt",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/module.mjs",
+      "require": "./dist/module.cjs"
+    }
+  },
+  "main": "./dist/module.cjs",
+  "types": "./dist/types.d.ts",
+  "files": [
+    "dist"
+  ],
+  "packageManager": "pnpm@7.13.2",
+  "keywords": [
+    "naive-ui",
+    "nuxt"
+  ],
+  "homepage": "https://github.com/kuizuo/naive-ui-nuxt#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kuizuo/naive-ui-nuxt.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kuizuo/naive-ui-nuxt/issues"
+  },
+  "scripts": {
+    "prepack": "nuxt-module-build",
+    "dev": "nuxi dev playground",
+    "dev:build": "nuxi build playground",
+    "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground",
+    "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest watch"
+  },
+  "dependencies": {
+    "@nuxt/kit": "^3.2.2"
+  },
+  "devDependencies": {
+    "@css-render/vue3-ssr": "^0.15.12",
+    "@nuxt/eslint-config": "^0.1.1",
+    "@nuxt/module-builder": "^0.2.1",
+    "@nuxt/schema": "^3.2.2",
+    "@nuxt/test-utils": "^3.2.2",
+    "changelogen": "^0.4.1",
+    "eslint": "^8.34.0",
+    "naive-ui": "^2.34.3",
+    "nuxt": "^3.2.2",
+    "vitest": "^0.28.5"
+  },
+  "peerDependencies": {
+    "naive-ui": ">=2.29.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}
