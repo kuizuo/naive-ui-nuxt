@@ -1,6 +1,6 @@
 {
   "name": "naive-ui-nuxt",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Naive UI module for Nuxt",
   "license": "MIT",
   "type": "module",
@@ -30,7 +30,7 @@
     "url": "https://github.com/kuizuo/naive-ui-nuxt/issues"
   },
   "scripts": {
-    "prepack": "nuxt-module-build",
+    "build": "nuxt-module-build",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground",

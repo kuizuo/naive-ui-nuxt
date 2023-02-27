@@ -8,7 +8,7 @@ export function resolveImports (config: ModuleOptions) {
   imports.forEach((item) => {
     addImports({
       name: item,
-      // as: item,
+      as: item,
       from: libraryName
     })
   })

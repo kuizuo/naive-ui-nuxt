@@ -1,10 +1,10 @@
 
-import * as AllComponents from 'naive-ui/es/components'
+import naive from 'naive-ui'
 import { ModuleOptions } from './module'
 
 export const libraryName = 'naive-ui'
 
-const allComponents = Object.keys(AllComponents)
+const allComponents = Object.keys(naive)
   .filter(name => /^N[A-Z]*/.test(name))
 
 // Object.keys(AllComponents).filter(name => /^use[A-Z]/.test(name))
@@ -13,7 +13,8 @@ const allImports = [
   'useDialogReactiveList',
   'useLoadingBar',
   'useMessage',
-  'useNotification'
+  'useNotification',
+  'useThemeVars',
 ]
 
 export const defaults: ModuleOptions = {
