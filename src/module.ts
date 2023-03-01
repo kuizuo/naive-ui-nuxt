@@ -1,38 +1,118 @@
-import { defineNuxtModule, addPlugin, createResolver } from '@nuxt/kit'
-import { resolveImports, resolveComponents } from './core'
-import { defaults, libraryName } from './config'
+import {
+  addComponent,
+  addImports,
+  addPluginTemplate,
+  defineNuxtModule,
+  extendViteConfig,
+} from "@nuxt/kit"
+import naive from "naive-ui"
+import { name, version } from "../package.json"
 
-export interface ModuleOptions {
-  components: string[]
-  imports: string[]
-}
+const naiveComponents = Object.keys(naive).filter((name) =>
+  /^N[A-Z]*/.test(name)
+)
+
+const naiveComposables = [
+  "useDialog",
+  "useDialogReactiveList",
+  "useLoadingBar",
+  "useMessage",
+  "useNotification",
+  "useThemeVars",
+]
+
+export interface ModuleOptions {}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
-    name: libraryName,
-    configKey: 'naiveUI',
+    name,
+    version,
+    configKey: "naiveUI",
     compatibility: {
-      nuxt: '^3.0.0'
-    }
+      nuxt: "^3.0.0",
+    },
   },
-  defaults,
+  defaults: {},
+  hooks: {
+    "prepare:types": ({ tsConfig, references }) => {
+      tsConfig.compilerOptions!.types.push("naive-ui/volar")
+      references.push({
+        types: "naive-ui/volar",
+      })
+    },
+  },
   setup(options, nuxt) {
-    const resolver = createResolver(import.meta.url)
+    // add imports for naive-ui components
+    naiveComponents.forEach((name) => {
+      addComponent({
+        export: name,
+        name: name,
+        filePath: "naive-ui",
+      })
+    })
 
-    addPlugin(resolver.resolve('./runtime/plugin'))
+    // add imports for naive-ui composables
+    naiveComposables.forEach((name) => {
+      addImports({
+        name: name,
+        as: name,
+        from: "naive-ui",
+      })
+    })
 
-    nuxt.options.imports.autoImport !== false && resolveImports(options)
-    nuxt.options.components !== false && resolveComponents(options)
+    addPluginTemplate({
+      filename: "naive-ui-plugin.mjs",
+      getContents: () => {
+        return `import { setup } from '@css-render/vue3-ssr'
+          import { defineNuxtPlugin } from '#app'
+
+          export default defineNuxtPlugin((nuxtApp) => {
+            if (process.server) {
+              const { collect } = setup(nuxtApp.vueApp)
+              const originalRenderMeta = nuxtApp.ssrContext?.renderMeta
+              nuxtApp.ssrContext = nuxtApp.ssrContext || {}
+              nuxtApp.ssrContext.renderMeta = () => {
+                if (!originalRenderMeta) {
+                  return {
+                    headTags: collect(),
+                  }
+                }
+                const originalMeta = originalRenderMeta()
+                if ('then' in originalMeta) {
+                  return originalMeta.then((resolvedOriginalMeta) => {
+                    return {
+                      ...resolvedOriginalMeta,
+                      headTags: resolvedOriginalMeta.headTags + collect(),
+                    }
+                  })
+                }
+                else {
+                  return {
+                    ...originalMeta,
+                    headTags: originalMeta.headTags + collect(),
+                  }
+                }
+              }
+            }
+          })`
+      },
+    })
 
     nuxt.options.build.transpile.push(
       ...(process.env.NODE_ENV === "production"
-        ? ["naive-ui", "vueuc", "@css-render/vue3-ssr", "@juggle/resize-observer"]
-        : ["@juggle/resize-observer"]));
+        ? [
+          "naive-ui",
+          "vueuc",
+          "@css-render/vue3-ssr",
+          "@juggle/resize-observer",
+        ]
+        : ["@juggle/resize-observer"]),
+    )
 
-    nuxt.options.vite.optimizeDeps = {
-      include: process.env.NODE_ENV === "development"
-        ? ["naive-ui", "vueuc", "date-fns-tz/esm/formatInTimeZone"]
-        : []
-    }
-  }
+    extendViteConfig((config) => {
+      config.optimizeDeps = config.optimizeDeps || {}
+      config.optimizeDeps.include = config.optimizeDeps.include || []
+      config.optimizeDeps.include.push("naive-ui")
+    })
+  },
 })

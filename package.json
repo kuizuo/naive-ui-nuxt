@@ -1,6 +1,6 @@
 {
   "name": "naive-ui-nuxt",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Naive UI module for Nuxt",
   "license": "MIT",
   "type": "module",
@@ -12,6 +12,7 @@
     }
   },
   "main": "./dist/module.cjs",
+  "module": "./dist/module.mjs",
   "types": "./dist/types.d.ts",
   "files": [
     "dist"

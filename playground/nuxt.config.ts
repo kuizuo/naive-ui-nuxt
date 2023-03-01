@@ -1,4 +1,6 @@
+import naiveUI from '..'
+
 export default defineNuxtConfig({
-  modules: ['../src/module'],
+  modules: [naiveUI],
   naiveUI: {}
 })
