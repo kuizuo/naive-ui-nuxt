@@ -98,21 +98,16 @@ export default defineNuxtModule<ModuleOptions>({
       },
     })
 
-    nuxt.options.build.transpile.push(
-      ...(process.env.NODE_ENV === "production"
-        ? [
-          "naive-ui",
-          "vueuc",
-          "@css-render/vue3-ssr",
-          "@juggle/resize-observer",
-        ]
-        : ["@juggle/resize-observer"]),
-    )
-
-    extendViteConfig((config) => {
-      config.optimizeDeps = config.optimizeDeps || {}
-      config.optimizeDeps.include = config.optimizeDeps.include || []
-      config.optimizeDeps.include.push("naive-ui")
-    })
+    // Transpile naive modules
+    if (process.env.NODE_ENV === "production") {
+      nuxt.options.build.transpile.push(
+        "naive-ui",
+        "vueuc",
+        "@css-render/vue3-ssr",
+        "@juggle/resize-observer"
+      )
+    } else {
+      nuxt.options.build.transpile.push("@juggle/resize-observer")
+    }
   },
 })
