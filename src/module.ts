@@ -2,10 +2,8 @@ import {
   addComponent,
   addImports,
   addPlugin,
-  addPluginTemplate,
   createResolver,
   defineNuxtModule,
-  extendViteConfig,
 } from "@nuxt/kit"
 import { fileURLToPath } from "url"
 import naive from "naive-ui"
@@ -38,10 +36,11 @@ export default defineNuxtModule<ModuleOptions>({
     // Do not add the extension since the `.ts` will be transpiled to `.mjs` after `npm run prepack`
     addPlugin(resolve(runtimeDir, "naive.server"))
 
-    const naiveComponents = Object.keys(naive).filter((name) =>
-      /^N[A-Z]*/.test(name)
-    )
     // add imports for naive-ui components
+    const naiveComponents = Object.keys(naive).filter((name) =>
+      /^(N[A-Z]|n-[a-z])/.test(name)
+    );
+
     naiveComponents.forEach((name) => {
       addComponent({
         export: name,
@@ -50,6 +49,7 @@ export default defineNuxtModule<ModuleOptions>({
       })
     })
 
+    // add imports for naive-ui composables
     const naiveComposables = [
       "useDialog",
       "useDialogReactiveList",
@@ -59,7 +59,6 @@ export default defineNuxtModule<ModuleOptions>({
       "useThemeVars",
     ]
 
-    // add imports for naive-ui composables
     naiveComposables.forEach((name) => {
       addImports({
         name: name,

@@ -1,6 +1,6 @@
 {
   "name": "naive-ui-nuxt",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Naive UI module for Nuxt",
   "license": "MIT",
   "type": "module",
@@ -39,16 +39,16 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.2.2"
+    "@nuxt/kit": "^3.2.2",
+    "naive-ui": "^2.34.3"
   },
   "devDependencies": {
-    "@css-render/vue3-ssr": "^0.15.12",
     "@nuxt/eslint-config": "^0.1.1",
     "@nuxt/module-builder": "^0.2.1",
     "@nuxt/schema": "^3.2.2",
     "@nuxt/test-utils": "^3.2.2",
+    "@types/node": "^18.14.6",
     "eslint": "^8.34.0",
-    "naive-ui": "^2.34.3",
     "nuxt": "^3.2.2"
   },
   "peerDependencies": {
