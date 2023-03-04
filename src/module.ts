@@ -1,25 +1,15 @@
 import {
   addComponent,
   addImports,
+  addPlugin,
   addPluginTemplate,
+  createResolver,
   defineNuxtModule,
   extendViteConfig,
 } from "@nuxt/kit"
+import { fileURLToPath } from "url"
 import naive from "naive-ui"
 import { name, version } from "../package.json"
-
-const naiveComponents = Object.keys(naive).filter((name) =>
-  /^N[A-Z]*/.test(name)
-)
-
-const naiveComposables = [
-  "useDialog",
-  "useDialogReactiveList",
-  "useLoadingBar",
-  "useMessage",
-  "useNotification",
-  "useThemeVars",
-]
 
 export interface ModuleOptions {}
 
@@ -42,6 +32,15 @@ export default defineNuxtModule<ModuleOptions>({
     },
   },
   setup(options, nuxt) {
+    const { resolve } = createResolver(import.meta.url)
+    const runtimeDir = fileURLToPath(new URL("./runtime", import.meta.url))
+
+    // Do not add the extension since the `.ts` will be transpiled to `.mjs` after `npm run prepack`
+    addPlugin(resolve(runtimeDir, "naive.server"))
+
+    const naiveComponents = Object.keys(naive).filter((name) =>
+      /^N[A-Z]*/.test(name)
+    )
     // add imports for naive-ui components
     naiveComponents.forEach((name) => {
       addComponent({
@@ -51,6 +50,15 @@ export default defineNuxtModule<ModuleOptions>({
       })
     })
 
+    const naiveComposables = [
+      "useDialog",
+      "useDialogReactiveList",
+      "useLoadingBar",
+      "useMessage",
+      "useNotification",
+      "useThemeVars",
+    ]
+
     // add imports for naive-ui composables
     naiveComposables.forEach((name) => {
       addImports({
@@ -58,44 +66,6 @@ export default defineNuxtModule<ModuleOptions>({
         as: name,
         from: "naive-ui",
       })
-    })
-
-    addPluginTemplate({
-      filename: "naive-ui-plugin.mjs",
-      getContents: () => {
-        return `import { setup } from '@css-render/vue3-ssr'
-          import { defineNuxtPlugin } from '#app'
-
-          export default defineNuxtPlugin((nuxtApp) => {
-            if (process.server) {
-              const { collect } = setup(nuxtApp.vueApp)
-              const originalRenderMeta = nuxtApp.ssrContext?.renderMeta
-              nuxtApp.ssrContext = nuxtApp.ssrContext || {}
-              nuxtApp.ssrContext.renderMeta = () => {
-                if (!originalRenderMeta) {
-                  return {
-                    headTags: collect(),
-                  }
-                }
-                const originalMeta = originalRenderMeta()
-                if ('then' in originalMeta) {
-                  return originalMeta.then((resolvedOriginalMeta) => {
-                    return {
-                      ...resolvedOriginalMeta,
-                      headTags: resolvedOriginalMeta.headTags + collect(),
-                    }
-                  })
-                }
-                else {
-                  return {
-                    ...originalMeta,
-                    headTags: originalMeta.headTags + collect(),
-                  }
-                }
-              }
-            }
-          })`
-      },
     })
 
     // Transpile naive modules
