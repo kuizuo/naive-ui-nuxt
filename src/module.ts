@@ -1,6 +1,6 @@
 import {
   addComponent,
-  addImports,
+  addImportsSources,
   addPlugin,
   createResolver,
   defineNuxtModule,
@@ -9,7 +9,8 @@ import { fileURLToPath } from "url"
 import naive from "naive-ui"
 import { name, version } from "../package.json"
 
-export interface ModuleOptions {}
+export interface ModuleOptions {
+}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -34,7 +35,7 @@ export default defineNuxtModule<ModuleOptions>({
     const runtimeDir = fileURLToPath(new URL("./runtime", import.meta.url))
 
     // Do not add the extension since the `.ts` will be transpiled to `.mjs` after `npm run prepack`
-    addPlugin(resolve(runtimeDir, "naive.server"))
+    addPlugin(resolve(runtimeDir, "plugin"))
 
     // add imports for naive-ui components
     const naiveComponents = Object.keys(naive).filter((name) =>
@@ -51,32 +52,37 @@ export default defineNuxtModule<ModuleOptions>({
 
     // add imports for naive-ui composables
     const naiveComposables = [
-      "useDialog",
-      "useDialogReactiveList",
-      "useLoadingBar",
-      "useMessage",
-      "useNotification",
-      "useThemeVars",
+      'useDialog',
+      'useMessage',
+      'useNotification',
+      'useLoadingBar',
     ]
 
-    naiveComposables.forEach((name) => {
-      addImports({
-        name: name,
-        as: name,
-        from: "naive-ui",
-      })
-    })
+    addImportsSources([
+      {
+        from: 'naive-ui',
+        imports: naiveComposables,
+      },
+    ])
 
     // Transpile naive modules
-    if (process.env.NODE_ENV === "production") {
-      nuxt.options.build.transpile.push(
-        "naive-ui",
-        "vueuc",
-        "@css-render/vue3-ssr",
-        "@juggle/resize-observer"
+    if (nuxt.options.dev) {
+      nuxt.options.build.transpile.push('@juggle/resize-observer')
+      nuxt.options.vite.optimizeDeps?.include?.push(
+        'naive-ui',
+        'vueuc',
+        'date-fns-tz/esm/formatInTimeZone',
       )
-    } else {
-      nuxt.options.build.transpile.push("@juggle/resize-observer")
+    }
+    else {
+      nuxt.options.build.transpile.push(
+        'naive-ui',
+        'vueuc',
+        '@css-render/vue3-ssr',
+        '@juggle/resize-observer',
+        'date-fns',
+      )
     }
   },
 })
+
